@@ -15,6 +15,10 @@ function anuario_render_form()
   $socials = $data ? json_decode($data->perfil_linkedin ?? '{}', true) : [];
   $success = false;
 
+  // Variables usadas en el formulario
+  $linkedin_enabled = !empty($socials['linkedin']);
+  $linkedin_url = $socials['linkedin'] ?? '';
+
   if (isset($_POST['confirm_save'])) {
     check_admin_referer('save_alumni');
 
@@ -62,48 +66,70 @@ function anuario_render_form()
       <table class="form-table">
         <tr>
           <th>Nombre</th>
-          <td><input type="text" name="nombre" value="<?php echo esc_attr($data->nombre ?? ''); ?>"></td>
+          <td>
+            <input type="text" name="nombre" value="<?php echo esc_attr($data->nombre ?? ''); ?>" required>
+          </td>
         </tr>
 
         <tr>
           <th>Cargo</th>
-          <td><input type="text" name="cargo_actual" value="<?php echo esc_attr($data->cargo_actual ?? ''); ?>"></td>
+          <td>
+            <input type="text" name="cargo_actual" value="<?php echo esc_attr($data->cargo_actual ?? ''); ?>">
+          </td>
         </tr>
+
         <tr>
           <th>LinkedIn</th>
           <td>
             <label>
-              <input type="checkbox" id="linkedin_enabled" <?php checked($linkedin_enabled); ?> />
+              <input
+                type="checkbox"
+                name="has_linkedin"
+                id="linkedin_enabled"
+                <?php checked($linkedin_enabled); ?>
+              />
               Posee LinkedIn
             </label>
 
             <br><br>
 
-            <input type="url" name="linkedin_url" id="linkedin_url" placeholder="https://www.linkedin.com/in/usuario"
-              value="<?php echo esc_attr($linkedin_url); ?>" style="width:400px" <?php echo $linkedin_enabled ? '' : 'disabled'; ?> />
+            <input
+              type="url"
+              name="linkedin_url"
+              id="linkedin_url"
+              placeholder="https://www.linkedin.com/in/usuario"
+              value="<?php echo esc_attr($linkedin_url); ?>"
+              style="width:400px"
+              <?php echo $linkedin_enabled ? '' : 'disabled'; ?>
+            />
           </td>
         </tr>
 
         <tr>
-          <th>Nivel éxito</th>
-          <td><input type="number" name="nivel_cargo" min="1" value="<?php echo esc_attr($data->nivel_cargo ?? ''); ?>">
+          <th>Nivel cargo</th>
+          <td>
+            <input type="number" name="nivel_cargo" min="1" value="<?php echo esc_attr($data->nivel_cargo ?? ''); ?>">
           </td>
         </tr>
 
         <tr>
           <th>Año egreso</th>
-          <td><input type="number" name="ano_egreso" value="<?php echo esc_attr($data->ano_egreso ?? ''); ?>"></td>
+          <td>
+            <input type="number" name="ano_egreso" value="<?php echo esc_attr($data->ano_egreso ?? ''); ?>">
+          </td>
         </tr>
 
         <tr>
-          <th>link_Foto (URL)</th>
-          <td><input type="url" name="link_foto" value="<?php echo esc_attr($data->link_foto ?? ''); ?>"></td>
+          <th>Link Foto (URL)</th>
+          <td>
+            <input type="url" name="link_foto" value="<?php echo esc_attr($data->link_foto ?? ''); ?>">
+          </td>
         </tr>
       </table>
 
       <p>
         <label>
-          <input type="checkbox" name="confirm_save" required>
+          <input type="checkbox" name="confirm_save" value="1" required>
           Confirmo que deseo guardar los cambios
         </label>
       </p>
