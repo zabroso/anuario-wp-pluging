@@ -19,12 +19,12 @@ function anuario_create_table() {
 
   $sql = "CREATE TABLE $table (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    nombre VARCHAR(255) NULL,
+    nombre VARCHAR(255) NOTNULL,
     cargo_actual VARCHAR(255) NULL,
-    redes_sociales TEXT NULL,
-    nivel_exito INT NULL,
-    fecha_egreso YEAR NULL,
-    foto VARCHAR(255) NULL,
+    perfil_linkedin TEXT NULL,
+    nivel_cargo INT NULL,
+    ano_egreso YEAR NULL,
+    link_foto VARCHAR(255) NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
   ) $charset;";
@@ -36,8 +36,6 @@ function anuario_create_table() {
 /* =========================================================
    MENÚ
 ========================================================= */
-
-
 
 add_action('admin_menu', function () {
   add_menu_page(
@@ -113,8 +111,8 @@ function anuario_render_list() {
         <tr>
           <td><?php echo esc_html($a->nombre); ?></td>
           <td><?php echo esc_html($a->cargo_actual); ?></td>
-          <td><?php echo esc_html($a->fecha_egreso); ?></td>
-          <td><?php echo esc_html($a->nivel_exito); ?></td>
+          <td><?php echo esc_html($a->ano_egreso); ?></td>
+          <td><?php echo esc_html($a->nivel_cargo); ?></td>
           <td>
             <a href="<?php echo admin_url('admin.php?page=anuario-alumni-edit&id=' . $a->id); ?>">Editar</a> |
             <a href="<?php echo wp_nonce_url(
@@ -145,7 +143,7 @@ function anuario_render_form() {
     ? $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE id=%d", $id))
     : null;
 
-  $socials = $data ? json_decode($data->redes_sociales ?? '{}', true) : [];
+  $socials = $data ? json_decode($data->perfil_linkedin ?? '{}', true) : [];
   $success = false;
 
   if (isset($_POST['confirm_save'])) {
@@ -161,10 +159,10 @@ function anuario_render_form() {
     $payload = [
       'nombre' => sanitize_text_field($_POST['nombre'] ?? ''),
       'cargo_actual' => sanitize_text_field($_POST['cargo_actual'] ?? ''),
-      'nivel_exito' => intval($_POST['nivel_exito'] ?? 0),
-      'fecha_egreso' => intval($_POST['fecha_egreso'] ?? 0),
-      'foto' => esc_url_raw($_POST['foto'] ?? ''),
-      'redes_sociales' => json_encode($redes),
+      'nivel_cargo' => intval($_POST['nivel_cargo'] ?? 0),
+      'ano_egreso' => intval($_POST['ano_egreso'] ?? 0),
+      'link_foto' => esc_url_raw($_POST['link_foto'] ?? ''),
+      'perfil_linkedin' => json_encode($redes),
     ];
 
     if ($id) {
@@ -175,7 +173,7 @@ function anuario_render_form() {
     }
 
     $data = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE id=%d", $id));
-    $socials = json_decode($data->redes_sociales ?? '{}', true);
+    $socials = json_decode($data->perfil_linkedin ?? '{}', true);
     $success = true;
   }
   ?>
@@ -226,17 +224,17 @@ function anuario_render_form() {
 
         <tr>
           <th>Nivel éxito</th>
-          <td><input type="number" name="nivel_exito" min="1" value="<?php echo esc_attr($data->nivel_exito ?? ''); ?>"></td>
+          <td><input type="number" name="nivel_cargo" min="1" value="<?php echo esc_attr($data->nivel_cargo ?? ''); ?>"></td>
         </tr>
 
         <tr>
           <th>Año egreso</th>
-          <td><input type="number" name="fecha_egreso" value="<?php echo esc_attr($data->fecha_egreso ?? ''); ?>"></td>
+          <td><input type="number" name="ano_egreso" value="<?php echo esc_attr($data->ano_egreso ?? ''); ?>"></td>
         </tr>
 
         <tr>
-          <th>Foto (URL)</th>
-          <td><input type="url" name="foto" value="<?php echo esc_attr($data->foto ?? ''); ?>"></td>
+          <th>link_Foto (URL)</th>
+          <td><input type="url" name="link_foto" value="<?php echo esc_attr($data->link_foto ?? ''); ?>"></td>
         </tr>
       </table>
 
@@ -317,21 +315,21 @@ function anuario_download_csv() {
     'nombre',
     'cargo_actual',
     'linkedin',
-    'nivel_exito',
-    'fecha_egreso',
-    'foto'
+    'nivel_cargo',
+    'ano_egreso',
+    'link_foto'
   ]);
 
   foreach ($rows as $r) {
-    $socials = json_decode($r['redes_sociales'] ?? '{}', true);
+    $socials = json_decode($r['perfil_linkedin'] ?? '{}', true);
 
     fputcsv($output, [
       $r['nombre'],
       $r['cargo_actual'],
       $socials['linkedin'] ?? '',
-      $r['nivel_exito'],
-      $r['fecha_egreso'],
-      $r['foto']
+      $r['nivel_cargo'],
+      $r['ano_egreso'],
+      $r['link_foto']
     ]);
   }
 
@@ -372,7 +370,7 @@ function anuario_render_bulk() {
   $file = fopen($_FILES['file']['tmp_name'], 'r');
   $headers = fgetcsv($file);
 
-  $expected = ['nombre','cargo_actual','linkedin','nivel_exito','fecha_egreso','foto'];
+  $expected = ['nombre','cargo_actual','linkedin','nivel_cargo','ano_egreso','link_foto'];
   if ($headers !== $expected) {
     fclose($file);
     $message = 'Formato de archivo incorrecto.';
@@ -389,10 +387,10 @@ function anuario_render_bulk() {
     $wpdb->insert($table, [
       'nombre' => sanitize_text_field($row[0]),
       'cargo_actual' => sanitize_text_field($row[1]),
-      'redes_sociales' => json_encode($redes),
-      'nivel_exito' => intval($row[3]),
-      'fecha_egreso' => intval($row[4]),
-      'foto' => esc_url_raw($row[5]),
+      'perfil_linkedin' => json_encode($redes),
+      'nivel_cargo' => intval($row[3]),
+      'ano_egreso' => intval($row[4]),
+      'link_foto' => esc_url_raw($row[5]),
     ]);
   }
 
