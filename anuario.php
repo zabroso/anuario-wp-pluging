@@ -1,14 +1,15 @@
 <?php
 /*
-Plugin Name: Anuario
-Description: CRUD de Alumni con API REST
-Version: 1.2
+Plugin Name: Anuario Alumni
+Description: Gestión de alumni para el anuario institucional
+Version: 1.0
+Author: Alumni
 */
 
 if (!defined('ABSPATH')) exit;
 
 /* =========================================================
-   ACTIVACIÓN — TABLA
+   ACTIVACIÓN – CREAR TABLA
 ========================================================= */
 
 register_activation_hook(__FILE__, 'anuario_create_table');
@@ -19,7 +20,7 @@ function anuario_create_table() {
 
   $sql = "CREATE TABLE $table (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    nombre VARCHAR(255) NOTNULL,
+    nombre VARCHAR(255) NOT NULL,
     cargo_actual VARCHAR(255) NULL,
     perfil_linkedin TEXT NULL,
     nivel_cargo INT NULL,
@@ -34,10 +35,11 @@ function anuario_create_table() {
 }
 
 /* =========================================================
-   MENÚ
+   MENÚ ADMIN
 ========================================================= */
 
 add_action('admin_menu', function () {
+
   add_menu_page(
     'Alumni',
     'Alumni',
@@ -57,13 +59,13 @@ add_action('admin_menu', function () {
   );
 
   add_submenu_page(
-  'anuario-alumni',
-  'Carga masiva',
-  'Carga masiva',
-  'manage_options',
-  'anuario-alumni-bulk',
-  'anuario_render_bulk'
-);
+    'anuario-alumni',
+    'Carga masiva',
+    'Carga masiva',
+    'manage_options',
+    'anuario-alumni-bulk',
+    'anuario_render_bulk'
+  );
 });
 
 /* =========================================================
@@ -77,13 +79,15 @@ function anuario_render_list() {
 
   if ($search) {
     $alumni = $wpdb->get_results(
-      $wpdb->prepare("SELECT * FROM $table WHERE nombre LIKE %s ORDER BY created_at DESC", "%$search%")
+      $wpdb->prepare(
+        "SELECT * FROM $table WHERE nombre LIKE %s ORDER BY created_at DESC",
+        '%' . $wpdb->esc_like($search) . '%'
+      )
     );
   } else {
     $alumni = $wpdb->get_results("SELECT * FROM $table ORDER BY created_at DESC");
   }
   ?>
-
   <div class="wrap">
     <h1 class="wp-heading-inline">Alumni</h1>
     <a href="<?php echo admin_url('admin.php?page=anuario-alumni-edit'); ?>" class="page-title-action">
@@ -100,30 +104,30 @@ function anuario_render_list() {
       <thead>
         <tr>
           <th>Nombre</th>
-          <th>Cargo</th>
+          <th>Cargo actual</th>
           <th>Año egreso</th>
-          <th>Éxito</th>
+          <th>Nivel éxito</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
-      <?php if ($alumni): foreach ($alumni as $a): ?>
-        <tr>
-          <td><?php echo esc_html($a->nombre); ?></td>
-          <td><?php echo esc_html($a->cargo_actual); ?></td>
-          <td><?php echo esc_html($a->ano_egreso); ?></td>
-          <td><?php echo esc_html($a->nivel_cargo); ?></td>
-          <td>
-            <a href="<?php echo admin_url('admin.php?page=anuario-alumni-edit&id=' . $a->id); ?>">Editar</a> |
-            <a href="<?php echo wp_nonce_url(
-              admin_url('admin.php?page=anuario-alumni&delete=' . $a->id),
-              'delete_alumni'
-            ); ?>" onclick="return confirm('¿Eliminar este alumni?')">Eliminar</a>
-          </td>
-        </tr>
-      <?php endforeach; else: ?>
-        <tr><td colspan="5">No hay registros</td></tr>
-      <?php endif; ?>
+        <?php if ($alumni): foreach ($alumni as $a): ?>
+          <tr>
+            <td><?php echo esc_html($a->nombre); ?></td>
+            <td><?php echo esc_html($a->cargo_actual); ?></td>
+            <td><?php echo esc_html($a->ano_egreso); ?></td>
+            <td><?php echo esc_html($a->nivel_cargo); ?></td>
+            <td>
+              <a href="<?php echo admin_url('admin.php?page=anuario-alumni-edit&id=' . $a->id); ?>">Editar</a> |
+              <a href="<?php echo wp_nonce_url(
+                admin_url('admin.php?page=anuario-alumni&delete=' . $a->id),
+                'delete_alumni'
+              ); ?>" onclick="return confirm('¿Eliminar este alumni?')">Eliminar</a>
+            </td>
+          </tr>
+        <?php endforeach; else: ?>
+          <tr><td colspan="5">No hay registros</td></tr>
+        <?php endif; ?>
       </tbody>
     </table>
   </div>
@@ -143,48 +147,36 @@ function anuario_render_form() {
     ? $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE id=%d", $id))
     : null;
 
-  $socials = $data ? json_decode($data->perfil_linkedin ?? '{}', true) : [];
   $success = false;
 
   if (isset($_POST['confirm_save'])) {
     check_admin_referer('save_alumni');
 
-    $redes = [];
-    if (isset($_POST['has_linkedin']) && $_POST['has_linkedin'] === 'on') {
-      if (!empty($_POST['linkedin_url'])) {
-        $redes['linkedin'] = esc_url_raw($_POST['linkedin_url']);
-      }
-    }
-
     $payload = [
-      'nombre' => sanitize_text_field($_POST['nombre'] ?? ''),
-      'cargo_actual' => sanitize_text_field($_POST['cargo_actual'] ?? ''),
-      'nivel_cargo' => intval($_POST['nivel_cargo'] ?? 0),
-      'ano_egreso' => intval($_POST['ano_egreso'] ?? 0),
-      'link_foto' => esc_url_raw($_POST['link_foto'] ?? ''),
-      'perfil_linkedin' => json_encode($redes),
+      'nombre' => sanitize_text_field($_POST['nombre']),
+      'cargo_actual' => sanitize_text_field($_POST['cargo_actual']),
+      'perfil_linkedin' => esc_url_raw($_POST['perfil_linkedin']),
+      'nivel_cargo' => intval($_POST['nivel_cargo']),
+      'ano_egreso' => intval($_POST['ano_egreso']) ?: null,
+      'link_foto' => esc_url_raw($_POST['link_foto']),
     ];
 
     if ($id) {
-      $wpdb->update($table, $payload, ['id' => $id]);
+      $wpdb->update($table, $payload, ['id' => $id], null, ['%d']);
     } else {
       $wpdb->insert($table, $payload);
       $id = $wpdb->insert_id;
     }
 
     $data = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE id=%d", $id));
-    $socials = json_decode($data->perfil_linkedin ?? '{}', true);
     $success = true;
   }
   ?>
-
   <div class="wrap">
     <h1><?php echo $id ? 'Editar Alumni' : 'Nuevo Alumni'; ?></h1>
 
     <?php if ($success): ?>
-      <div class="notice notice-success">
-        <p>Guardado con éxito.</p>
-      </div>
+      <div class="notice notice-success"><p>Guardado con éxito.</p></div>
     <?php endif; ?>
 
     <form method="post">
@@ -193,37 +185,27 @@ function anuario_render_form() {
       <table class="form-table">
         <tr>
           <th>Nombre</th>
-          <td><input type="text" name="nombre" value="<?php echo esc_attr($data->nombre ?? ''); ?>"></td>
+          <td><input type="text" name="nombre" required value="<?php echo esc_attr($data->nombre ?? ''); ?>"></td>
         </tr>
 
         <tr>
-          <th>Cargo</th>
+          <th>Cargo actual</th>
           <td><input type="text" name="cargo_actual" value="<?php echo esc_attr($data->cargo_actual ?? ''); ?>"></td>
         </tr>
+
         <tr>
-            <th>LinkedIn</th>
-            <td>
-                          <label>
-                            <input type="checkbox" id="linkedin_enabled" <?php checked($linkedin_enabled); ?> />
-                            Posee LinkedIn
-                          </label>
-            
-                          <br><br>
-            
-                          <input
-                            type="url"
-                            name="linkedin_url"
-                            id="linkedin_url"
-                            placeholder="https://www.linkedin.com/in/usuario"
-                            value="<?php echo esc_attr($linkedin_url); ?>"
-                            style="width:400px"
-                            <?php echo $linkedin_enabled ? '' : 'disabled'; ?>
-                          />
-                        </td>
+          <th>LinkedIn</th>
+          <td>
+            <input type="url"
+                   name="perfil_linkedin"
+                   value="<?php echo esc_attr($data->perfil_linkedin ?? ''); ?>"
+                   placeholder="https://www.linkedin.com/in/usuario"
+                   style="width:400px">
+          </td>
         </tr>
 
         <tr>
-          <th>Nivel éxito</th>
+          <th>Nivel de éxito</th>
           <td><input type="number" name="nivel_cargo" min="1" value="<?php echo esc_attr($data->nivel_cargo ?? ''); ?>"></td>
         </tr>
 
@@ -233,7 +215,7 @@ function anuario_render_form() {
         </tr>
 
         <tr>
-          <th>link_Foto (URL)</th>
+          <th>Link foto</th>
           <td><input type="url" name="link_foto" value="<?php echo esc_attr($data->link_foto ?? ''); ?>"></td>
         </tr>
       </table>
@@ -251,30 +233,24 @@ function anuario_render_form() {
       </p>
     </form>
   </div>
-  <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const checkbox = document.getElementById('linkedin_enabled');
-    const input = document.getElementById('linkedin_url');
-
-    checkbox.addEventListener('change', function () {
-      input.disabled = !this.checked;
-      if (!this.checked) input.value = '';
-    });
-  });
-  </script>
   <?php
 }
-
-  
 
 /* =========================================================
    ELIMINAR
 ========================================================= */
 
 add_action('admin_init', function () {
-  if (isset($_GET['delete']) && wp_verify_nonce($_GET['_wpnonce'], 'delete_alumni')) {
+  if (
+    isset($_GET['delete'], $_GET['_wpnonce']) &&
+    wp_verify_nonce($_GET['_wpnonce'], 'delete_alumni')
+  ) {
     global $wpdb;
-    $wpdb->delete($wpdb->prefix . 'anuario_alumni', ['id' => intval($_GET['delete'])]);
+    $wpdb->delete(
+      $wpdb->prefix . 'anuario_alumni',
+      ['id' => intval($_GET['delete'])],
+      ['%d']
+    );
     wp_redirect(admin_url('admin.php?page=anuario-alumni'));
     exit;
   }
@@ -298,7 +274,11 @@ add_action('rest_api_init', function () {
   ]);
 });
 
-function anuario_download_csv() {
+/* =========================================================
+   EXPORT CSV
+========================================================= */
+
+add_action('admin_init', function () {
   if (!isset($_GET['anuario_export'])) return;
   if (!current_user_can('manage_options')) return;
 
@@ -314,19 +294,17 @@ function anuario_download_csv() {
   fputcsv($output, [
     'nombre',
     'cargo_actual',
-    'linkedin',
+    'perfil_linkedin',
     'nivel_cargo',
     'ano_egreso',
     'link_foto'
   ]);
 
   foreach ($rows as $r) {
-    $socials = json_decode($r['perfil_linkedin'] ?? '{}', true);
-
     fputcsv($output, [
       $r['nombre'],
       $r['cargo_actual'],
-      $socials['linkedin'] ?? '',
+      $r['perfil_linkedin'],
       $r['nivel_cargo'],
       $r['ano_egreso'],
       $r['link_foto']
@@ -335,150 +313,119 @@ function anuario_download_csv() {
 
   fclose($output);
   exit;
-}
-add_action('admin_init', 'anuario_download_csv');
+});
+
+/* =========================================================
+   CARGA MASIVA CSV
+========================================================= */
 
 function anuario_render_bulk() {
   global $wpdb;
   $table = $wpdb->prefix . 'anuario_alumni';
-
   $message = '';
 
   if (isset($_POST['bulk_import'])) {
-  check_admin_referer('anuario_bulk');
+    check_admin_referer('anuario_bulk');
 
-  if (empty($_FILES['file']['tmp_name'])) {
-    $message = 'No se seleccionó ningún archivo.';
-    return;
-  }
+    if (empty($_FILES['file']['tmp_name'])) {
+      $message = 'No se seleccionó ningún archivo.';
+    } else {
 
-  $mode = $_POST['bulk_mode'] ?? 'append';
+      $mode = $_POST['bulk_mode'] ?? 'append';
 
-  if ($mode === 'replace') {
-    if (
-      empty($_POST['confirm_replace_1']) ||
-      empty($_POST['confirm_replace_2']) ||
-      empty($_POST['confirm_replace_3'])
-    ) {
-      $message = 'Debes confirmar todas las casillas para reescribir la base.';
-      return;
+      if ($mode === 'replace') {
+        if (
+          empty($_POST['confirm_replace_1']) ||
+          empty($_POST['confirm_replace_2']) ||
+          empty($_POST['confirm_replace_3'])
+        ) {
+          $message = 'Debes confirmar todas las casillas.';
+          goto render;
+        }
+        $wpdb->query("TRUNCATE TABLE $table");
+      }
+
+      $file = fopen($_FILES['file']['tmp_name'], 'r');
+      $headers = fgetcsv($file);
+
+      $expected = [
+        'nombre',
+        'cargo_actual',
+        'perfil_linkedin',
+        'nivel_cargo',
+        'ano_egreso',
+        'link_foto'
+      ];
+
+      if ($headers !== $expected) {
+        $message = 'Formato CSV incorrecto.';
+        fclose($file);
+        goto render;
+      }
+
+      while (($row = fgetcsv($file)) !== false) {
+        $wpdb->insert($table, [
+          'nombre' => sanitize_text_field($row[0]),
+          'cargo_actual' => sanitize_text_field($row[1]),
+          'perfil_linkedin' => esc_url_raw($row[2]),
+          'nivel_cargo' => intval($row[3]),
+          'ano_egreso' => intval($row[4]) ?: null,
+          'link_foto' => esc_url_raw($row[5]),
+        ]);
+      }
+
+      fclose($file);
+      $message = 'Carga masiva realizada con éxito.';
     }
-
-    $wpdb->query("TRUNCATE TABLE $table");
   }
 
-  $file = fopen($_FILES['file']['tmp_name'], 'r');
-  $headers = fgetcsv($file);
-
-  $expected = ['nombre','cargo_actual','linkedin','nivel_cargo','ano_egreso','link_foto'];
-  if ($headers !== $expected) {
-    fclose($file);
-    $message = 'Formato de archivo incorrecto.';
-    return;
-  }
-
-  while (($row = fgetcsv($file)) !== false) {
-    $redes = [];
-
-    if (!empty($row[2])) {
-      $redes['linkedin'] = esc_url_raw($row[2]);
-    }
-
-    $wpdb->insert($table, [
-      'nombre' => sanitize_text_field($row[0]),
-      'cargo_actual' => sanitize_text_field($row[1]),
-      'perfil_linkedin' => json_encode($redes),
-      'nivel_cargo' => intval($row[3]),
-      'ano_egreso' => intval($row[4]),
-      'link_foto' => esc_url_raw($row[5]),
-    ]);
-  }
-
-  fclose($file);
-  $message = 'Carga masiva realizada con éxito.';
-}
-
+  render:
   ?>
-
   <div class="wrap">
     <h1>Carga masiva de Alumni</h1>
 
-    <p>
-      Recomendamos <strong>descargar un respaldo</strong> antes de realizar una carga masiva.
-    </p>
-
-    <p>
-      <a href="<?php echo admin_url('admin.php?page=anuario-alumni&anuario_export=1'); ?>"
-         class="button button-secondary">
-        Descargar respaldo (CSV)
-      </a>
-    </p>
-
-    <hr>
-
     <?php if ($message): ?>
-      <div class="notice notice-success">
-        <p><?php echo esc_html($message); ?></p>
-      </div>
+      <div class="notice notice-success"><p><?php echo esc_html($message); ?></p></div>
     <?php endif; ?>
 
     <form method="post" enctype="multipart/form-data">
-  <?php wp_nonce_field('anuario_bulk'); ?>
+      <?php wp_nonce_field('anuario_bulk'); ?>
 
-  <table class="form-table">
-    <tr>
-      <th>Archivo CSV</th>
-      <td>
-        <input type="file" name="file" accept=".csv" required>
-      </td>
-    </tr>
+      <table class="form-table">
+        <tr>
+          <th>Archivo CSV</th>
+          <td><input type="file" name="file" accept=".csv" required></td>
+        </tr>
 
-    <tr>
-      <th>Modo de carga</th>
-      <td>
-        <label>
-          <input type="radio" name="bulk_mode" value="append" checked>
-          Añadir datos (no elimina información existente)
-        </label><br>
+        <tr>
+          <th>Modo</th>
+          <td>
+            <label><input type="radio" name="bulk_mode" value="append" checked> Añadir</label><br>
+            <label><input type="radio" name="bulk_mode" value="replace"> Reemplazar</label>
+          </td>
+        </tr>
+      </table>
 
-        <label>
-          <input type="radio" name="bulk_mode" value="replace">
-          Reescribir toda la base de datos
-        </label>
-      </td>
-    </tr>
-  </table>
+      <div id="replace-warning" style="display:none">
+        <label><input type="checkbox" name="confirm_replace_1"> Entiendo</label><br>
+        <label><input type="checkbox" name="confirm_replace_2"> Tengo respaldo</label><br>
+        <label><input type="checkbox" name="confirm_replace_3"> Confirmo</label>
+      </div>
 
-  <div id="replace-warning" style="display:none; margin-top:15px;">
-    <p style="color:#b91c1c;">
-      Esta acción eliminará todos los alumni actuales.
-      Recomendamos descargar un respaldo antes de continuar.
-    </p>
-
-    <label><input type="checkbox" name="confirm_replace_1"> Entiendo que se eliminarán los datos</label><br>
-    <label><input type="checkbox" name="confirm_replace_2"> He descargado un respaldo</label><br>
-    <label><input type="checkbox" name="confirm_replace_3"> Confirmo que deseo continuar</label>
+      <p>
+        <button class="button button-primary" name="bulk_import">Ejecutar</button>
+        <a href="<?php echo admin_url('admin.php?page=anuario-alumni'); ?>" class="button">Volver</a>
+      </p>
+    </form>
   </div>
 
-  <p style="margin-top:20px;">
-    <button class="button button-primary" name="bulk_import">
-      Ejecutar carga
-    </button>
-    <a href="<?php echo admin_url('admin.php?page=anuario-alumni'); ?>" class="button">
-      Volver
-    </a>
-  </p>
-</form>
-
-<script>
-document.querySelectorAll('input[name="bulk_mode"]').forEach(el => {
-  el.addEventListener('change', () => {
-    document.getElementById('replace-warning').style.display =
-      el.value === 'replace' ? 'block' : 'none';
+  <script>
+  document.querySelectorAll('input[name="bulk_mode"]').forEach(el => {
+    el.addEventListener('change', () => {
+      document.getElementById('replace-warning').style.display =
+        el.value === 'replace' ? 'block' : 'none';
+    });
   });
-});
-</script>
-
-  </div>
+  </script>
   <?php
 }
