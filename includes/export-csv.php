@@ -1,11 +1,15 @@
 <?php
-if (!defined('ABSPATH')) exit;
+if (!defined('ABSPATH'))
+  exit;
 
 add_action('admin_init', 'anuario_download_csv');
 
-function anuario_download_csv() {
-  if (!isset($_GET['anuario_export'])) return;
-  if (!current_user_can('manage_options')) return;
+function anuario_download_csv()
+{
+  if (!isset($_GET['anuario_export']))
+    return;
+  if (!current_user_can('manage_options'))
+    return;
 
   global $wpdb;
   $table = $wpdb->prefix . 'anuario_alumni';

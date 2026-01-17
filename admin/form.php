@@ -1,7 +1,9 @@
 <?php
-if (!defined('ABSPATH')) exit;
+if (!defined('ABSPATH'))
+  exit;
 
-function anuario_render_form() {
+function anuario_render_form()
+{
   global $wpdb;
   $table = $wpdb->prefix . 'anuario_alumni';
   $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
@@ -68,30 +70,24 @@ function anuario_render_form() {
           <td><input type="text" name="cargo_actual" value="<?php echo esc_attr($data->cargo_actual ?? ''); ?>"></td>
         </tr>
         <tr>
-            <th>LinkedIn</th>
-            <td>
-                          <label>
-                            <input type="checkbox" id="linkedin_enabled" <?php checked($linkedin_enabled); ?> />
-                            Posee LinkedIn
-                          </label>
-            
-                          <br><br>
-            
-                          <input
-                            type="url"
-                            name="linkedin_url"
-                            id="linkedin_url"
-                            placeholder="https://www.linkedin.com/in/usuario"
-                            value="<?php echo esc_attr($linkedin_url); ?>"
-                            style="width:400px"
-                            <?php echo $linkedin_enabled ? '' : 'disabled'; ?>
-                          />
-                        </td>
+          <th>LinkedIn</th>
+          <td>
+            <label>
+              <input type="checkbox" id="linkedin_enabled" <?php checked($linkedin_enabled); ?> />
+              Posee LinkedIn
+            </label>
+
+            <br><br>
+
+            <input type="url" name="linkedin_url" id="linkedin_url" placeholder="https://www.linkedin.com/in/usuario"
+              value="<?php echo esc_attr($linkedin_url); ?>" style="width:400px" <?php echo $linkedin_enabled ? '' : 'disabled'; ?> />
+          </td>
         </tr>
 
         <tr>
           <th>Nivel éxito</th>
-          <td><input type="number" name="nivel_cargo" min="1" value="<?php echo esc_attr($data->nivel_cargo ?? ''); ?>"></td>
+          <td><input type="number" name="nivel_cargo" min="1" value="<?php echo esc_attr($data->nivel_cargo ?? ''); ?>">
+          </td>
         </tr>
 
         <tr>
@@ -119,15 +115,15 @@ function anuario_render_form() {
     </form>
   </div>
   <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const checkbox = document.getElementById('linkedin_enabled');
-    const input = document.getElementById('linkedin_url');
+    document.addEventListener('DOMContentLoaded', function () {
+      const checkbox = document.getElementById('linkedin_enabled');
+      const input = document.getElementById('linkedin_url');
 
-    checkbox.addEventListener('change', function () {
-      input.disabled = !this.checked;
-      if (!this.checked) input.value = '';
+      checkbox.addEventListener('change', function () {
+        input.disabled = !this.checked;
+        if (!this.checked) input.value = '';
+      });
     });
-  });
   </script>
   <?php
 }
