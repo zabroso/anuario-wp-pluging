@@ -1,7 +1,9 @@
 <?php
-if (!defined('ABSPATH')) exit;
+if (!defined('ABSPATH'))
+  exit;
 
-function anuario_render_list() {
+function anuario_render_list()
+{
   global $wpdb;
   $table = $wpdb->prefix . 'anuario_alumni';
   $search = isset($_GET['s']) ? sanitize_text_field($_GET['s']) : '';
@@ -38,23 +40,26 @@ function anuario_render_list() {
         </tr>
       </thead>
       <tbody>
-      <?php if ($alumni): foreach ($alumni as $a): ?>
-        <tr>
-          <td><?php echo esc_html($a->nombre); ?></td>
-          <td><?php echo esc_html($a->cargo_actual); ?></td>
-          <td><?php echo esc_html($a->ano_egreso); ?></td>
-          <td><?php echo esc_html($a->nivel_cargo); ?></td>
-          <td>
-            <a href="<?php echo admin_url('admin.php?page=anuario-alumni-edit&id=' . $a->id); ?>">Editar</a> |
-            <a href="<?php echo wp_nonce_url(
-              admin_url('admin.php?page=anuario-alumni&delete=' . $a->id),
-              'delete_alumni'
-            ); ?>" onclick="return confirm('¿Eliminar este alumni?')">Eliminar</a>
-          </td>
-        </tr>
-      <?php endforeach; else: ?>
-        <tr><td colspan="5">No hay registros</td></tr>
-      <?php endif; ?>
+        <?php if ($alumni):
+          foreach ($alumni as $a): ?>
+            <tr>
+              <td><?php echo esc_html($a->nombre); ?></td>
+              <td><?php echo esc_html($a->cargo_actual); ?></td>
+              <td><?php echo esc_html($a->ano_egreso); ?></td>
+              <td><?php echo esc_html($a->nivel_cargo); ?></td>
+              <td>
+                <a href="<?php echo admin_url('admin.php?page=anuario-alumni-edit&id=' . $a->id); ?>">Editar</a> |
+                <a href="<?php echo wp_nonce_url(
+                  admin_url('admin.php?page=anuario-alumni&delete=' . $a->id),
+                  'delete_alumni'
+                ); ?>" onclick="return confirm('¿Eliminar este alumni?')">Eliminar</a>
+              </td>
+            </tr>
+          <?php endforeach; else: ?>
+          <tr>
+            <td colspan="5">No hay registros</td>
+          </tr>
+        <?php endif; ?>
       </tbody>
     </table>
   </div>

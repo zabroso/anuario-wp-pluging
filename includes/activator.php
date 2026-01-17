@@ -1,12 +1,14 @@
 <?php
-if (!defined('ABSPATH')) exit;
+if (!defined('ABSPATH'))
+  exit;
 
 register_activation_hook(
   dirname(__DIR__) . '/anuario.php',
   'anuario_create_table'
 );
 
-function anuario_create_table() {
+function anuario_create_table()
+{
   global $wpdb;
   $table = $wpdb->prefix . 'anuario_alumni';
   $charset = $wpdb->get_charset_collate();
