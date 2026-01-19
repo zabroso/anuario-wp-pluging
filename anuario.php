@@ -572,7 +572,7 @@ add_action('rest_api_init', function () {
             global $wpdb;
             $table = $wpdb->prefix . 'anuario_alumni';
             
-            $results = $wpdb->get_results("SELECT * FROM $table ORDER BY created_at DESC", ARRAY_A);
+            $results = $wpdb->get_results("SELECT nombre,cargo_actual,empresa,perfil_linkedin,nivel_cargo,ano_egreso,link_foto FROM $table ORDER BY created_at DESC", ARRAY_A);
 
             // Convertimos campos vacíos a "None", excepto el nombre
             foreach ($results as &$alumni) {
