@@ -133,6 +133,8 @@ function anuario_render_list() {
               <td><?php echo esc_html($a->fecha_nacimiento ?? '—'); ?></td>
               <td><?php echo $a->autorizacion_publica ? 'Sí' : 'No'; ?></td>
               <td>
+                <a href="<?php echo admin_url('admin.php?page=anuario-alumni-view&id=' . $a->id); ?>">Ver</a>
+                |
                 <a href="<?php echo admin_url('admin.php?page=anuario-alumni-edit&id=' . $a->id); ?>">Editar</a>
                 |
                 <a href="<?php echo admin_url('admin.php?page=anuario-alumni-comments&id=' . $a->id); ?>">Comentarios</a>

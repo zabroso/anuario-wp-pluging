@@ -16,6 +16,7 @@ require_once plugin_dir_path(__FILE__) . 'includes/admin-form.php';
 require_once plugin_dir_path(__FILE__) . 'includes/admin-bulk.php';
 require_once plugin_dir_path(__FILE__) . 'includes/admin-comments.php';
 require_once plugin_dir_path(__FILE__) . 'includes/admin-programs.php';
+require_once plugin_dir_path(__FILE__) . 'includes/admin-view.php';
 require_once plugin_dir_path(__FILE__) . 'includes/api.php';
 
 register_activation_hook(__FILE__, 'anuario_create_table');
@@ -64,5 +65,14 @@ add_action('admin_menu', function () {
     'manage_options',
     'anuario-alumni-bulk',
     'anuario_render_bulk'
+  );
+
+  add_submenu_page(
+    null,
+    'Ver Alumni',
+    'Ver',
+    'manage_options',
+    'anuario-alumni-view',
+    'anuario_render_view'
   );
 });
