@@ -1,21 +1,21 @@
-nombre,cargo_actual,empresa,perfil_linkedin,nivel_cargo,ano_egreso,link_foto
-Juan Pérez,Ingeniero de Software,Google,https://www.linkedin.com/in/juanperez,5,2020
-María López,Gerente de Marketing,Amazon,https://www.linkedin.com/in/marialopez,7,2018
-Carlos Gómez,Analista Financiero,BBVA,https://www.linkedin.com/in/carlosgomez,4,2019
-Ana Torres,Desarrolladora Web,Microsoft,https://www.linkedin.com/in/anatorres,3,2021
-Pedro Fernández,Consultor SAP,Deloitte,https://www.linkedin.com/in/pedrofernandez,6,2017
-Lucía Martínez,Data Scientist,IBM,https://www.linkedin.com/in/luciamartinez,5,2022
-Jorge Ramírez,Arquitecto de Software,Oracle,https://www.linkedin.com/in/jorgeramirez,8,2016
-Sofía Castillo,Especialista UX,Airbnb,https://www.linkedin.com/in/sofiacastillo,4,2020
-Diego Vargas,Ingeniero de Datos,Facebook,https://www.linkedin.com/in/diegovargas,5,2019
-Carolina Rojas,Marketing Digital,Spotify,https://www.linkedin.com/in/carolinarojas,6,2021
-Andrés Herrera,Gerente de Producto,Netflix,https://www.linkedin.com/in/andresherrera,7,2018
-Valentina Moreno,Analista de Negocios,Apple,https://www.linkedin.com/in/valentinamoreno,4,2020
-Felipe Soto,Desarrollador Full Stack,Uber,https://www.linkedin.com/in/felipesoto,3,2021
-Isabel Díaz,Consultora Estratégica,KPMG,https://www.linkedin.com/in/isabeldiaz,6,2017
-Tomás Muñoz,Ingeniero DevOps,Slack,https://www.linkedin.com/in/tomasmunoz,5,2019
-Natalia Silva,Product Owner,Zoom,https://www.linkedin.com/in/nataliasilva,7,2018
-Ricardo Campos,Analista de Datos,Intel,https://www.linkedin.com/in/ricardocampos,4,2020
-Camila Paredes,Diseñadora UI,Adobe,https://www.linkedin.com/in/camilaparedes,3,2021
-Sebastián Reyes,Gerente de Tecnología,Salesforce,https://www.linkedin.com/in/sebastianreyes,8,2016
-Paula Ortega,Especialista en SEO,Twitter,https://www.linkedin.com/in/paulaortega,4,2020
+nombre,rut,fecha_nacimiento,cargo_actual,empresa,perfil_linkedin,nivel_cargo,ano_egreso,link_foto,autorizacion_publica
+Juan Pérez,12.345.678-9,1992-03-15,Ingeniero de Software,Google,https://www.linkedin.com/in/juanperez,5,2020,,1
+María López,11.234.567-8,1993-07-22,Gerente de Marketing,Amazon,https://www.linkedin.com/in/marialopez,7,2018,,1
+Carlos Gómez,13.456.789-0,1991-11-08,Analista Financiero,BBVA,https://www.linkedin.com/in/carlosgomez,4,2019,,0
+Ana Torres,10.987.654-3,1994-01-30,Desarrolladora Web,Microsoft,https://www.linkedin.com/in/anatorres,3,2021,,1
+Pedro Fernández,14.567.890-1,1990-05-17,Consultor SAP,Deloitte,https://www.linkedin.com/in/pedrofernandez,6,2017,,0
+Lucía Martínez,9.876.543-2,1995-09-04,Data Scientist,IBM,https://www.linkedin.com/in/luciamartinez,5,2022,,1
+Jorge Ramírez,15.678.901-2,1989-12-19,Arquitecto de Software,Oracle,https://www.linkedin.com/in/jorgeramirez,8,2016,,1
+Sofía Castillo,8.765.432-1,1993-04-11,Especialista UX,Airbnb,https://www.linkedin.com/in/sofiacastillo,4,2020,,0
+Diego Vargas,16.789.012-3,1991-08-25,Ingeniero de Datos,Meta,https://www.linkedin.com/in/diegovargas,5,2019,,1
+Carolina Rojas,7.654.321-0,1994-02-14,Marketing Digital,Spotify,https://www.linkedin.com/in/carolinarojas,6,2021,,1
+Andrés Herrera,17.890.123-4,1990-10-03,Gerente de Producto,Netflix,https://www.linkedin.com/in/andresherrera,7,2018,,1
+Valentina Moreno,18.901.234-5,1992-06-28,Analista de Negocios,Apple,https://www.linkedin.com/in/valentinamoreno,4,2020,,0
+Felipe Soto,6.543.210-9,1994-11-16,Desarrollador Full Stack,Uber,https://www.linkedin.com/in/felipesoto,3,2021,,1
+Isabel Díaz,19.012.345-6,1990-03-07,Consultora Estratégica,KPMG,https://www.linkedin.com/in/isabeldiaz,6,2017,,0
+Tomás Muñoz,5.432.109-8,1992-09-21,Ingeniero DevOps,Slack,https://www.linkedin.com/in/tomasmunoz,5,2019,,1
+Natalia Silva,20.123.456-7,1991-05-13,Product Owner,Zoom,https://www.linkedin.com/in/nataliasilva,7,2018,,1
+Ricardo Campos,4.321.098-7,1993-01-09,Analista de Datos,Intel,https://www.linkedin.com/in/ricardocampos,4,2020,,0
+Camila Paredes,21.234.567-8,1995-07-31,Diseñadora UI,Adobe,https://www.linkedin.com/in/camilaparedes,3,2021,,1
+Sebastián Reyes,3.210.987-6,1988-12-02,Gerente de Tecnología,Salesforce,https://www.linkedin.com/in/sebastianreyes,8,2016,,1
+Paula Ortega,22.345.678-9,1993-04-18,Especialista en SEO,Twitter,https://www.linkedin.com/in/paulaortega,4,2020,,0
